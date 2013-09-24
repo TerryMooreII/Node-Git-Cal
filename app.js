@@ -2,7 +2,10 @@ var https = require('https');
 var async = require('async');
 
 var repos = [];
+
 var commits = [];
+var emailAddress = 'terry.moore.ii@gmail.com';
+
 // var commits = [ '2013-04-17T01:05:15Z',
 //   '2013-04-17T01:02:02Z',
 //   '2011-09-22T02:14:40Z',
@@ -348,7 +351,7 @@ request = https.get(options, function(res){
       
       async.each(repos, getCommits, function(err){
         console.log(err);
-        console.log(commits);
+        console.log(commits.sort());
         console.log(commits.length);
       })      
       //repos.forEach( function(repo){getCommits(repo)} );
@@ -387,15 +390,12 @@ request = https.get(options, function(res){
       var json = JSON.parse(body);   
     
       json.forEach(function(obj){
-        if (obj.commit.committer && 
-            obj.commit.committer.email.toLowerCase() === 'tmoore@csgralmac06.local')
-          //(obj.commit.committer.email.toLowerCase() !== 'terry.moore.ii@gmail.com' && obj.commit.committer.email.toLowerCase() !== 'motersho@gmail.com' ))
-          commits.push(obj.commit.committer);
+        if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === emailAddress)
+          commits.push(convertDate(obj.commit.committer.date));
       });
 
-      //console.log(commits.length)
-      
       callback();
+
    });
 
    res.on('error', function(e) {
@@ -405,3 +405,38 @@ request = https.get(options, function(res){
 });
 
 }
+
+
+//'2013-09-24T00:35:13Z'
+function convertDate(date){
+//return date;
+  var y = date.substr(0, 4);
+  var m = date.substr(5,2);
+  var d = date.substr(8,2);
+  var h = date.substr(11,2);
+  var min = date.substr(14, 2);
+  var s = date.substr(17, 2);
+  
+  var da = new Date(y, m, d, h, min, s);
+  
+  console.log("Date: %s :: %d %d %d %d %d %d :: %s", date, y, m, d, h, min, s, da)
+  
+  return da;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
