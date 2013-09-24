@@ -391,7 +391,7 @@ request = https.get(options, function(res){
     
       json.forEach(function(obj){
         if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === emailAddress)
-          commits.push(convertDate(obj.commit.committer.date));
+          commits.push(new Date(obj.commit.committer.date));
       });
 
       callback();
