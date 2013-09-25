@@ -304,6 +304,7 @@ function getCount(){
     var commit = commits[i];
     
     var d = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
+    //console.log('%s :: %s', cd, d)
     
     if (cd !== undefined && cd.getTime() === d.getTime()){
       count++;
@@ -313,8 +314,9 @@ function getCount(){
     }
   
     cd = d;
-    c[cd.getTime()] = count;    
+    c[cd] = count;    
   }
+
   return c;
 }
 
@@ -347,13 +349,11 @@ request = https.get(options, function(res){
       
       async.each(repos, getCommits, function(err){
         console.log(err);
-        console.log(commits.sort(function(a,b){
+        commits.sort(function(a,b){
             return a<b ? -1 :a > b ? 1:0;
-          }));
-          console.log(commits.length);
-          var counts = getCount();
-          console.log(counts)
-          showDates(counts);
+          });
+          var count = getCount();
+          showDates(count);
       });      
 
    });
@@ -406,12 +406,8 @@ request = https.get(options, function(res){
 
 
 function showDates(counts){
-
-return;
-
+  console.log(counts)
 }
-
-
 
 
 
