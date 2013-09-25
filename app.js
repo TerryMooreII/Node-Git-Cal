@@ -285,43 +285,39 @@ var emailAddress = 'terry.moore.ii@gmail.com';
 //   '2012-09-22T17:07:27Z',
 //   '2012-09-22T16:51:12Z' ];
 
-// var now = new Date(Date.now());
-// var daysOfYear = [];
 
-// for (var d = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() ); d <= now; d.setDate(d.getDate() + 1)) {
-//     daysOfYear.push(new Date(d));
-// }
+function getCount(){
 
+  var now = new Date(Date.now());
+  var daysOfYear = [];
 
-// console.log(daysOfYear)
+  for (var d = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() ); d <= now; d.setDate(d.getDate() + 1)) {
+      daysOfYear.push(new Date(d));
+  }
 
+  var c = [];
+  var cd;
+  var count =0;
 
-// commits = commits.sort();
-
-
-// var c = [];
-// var cd;
-// var count =0;
-
-// for (var i=0; i< commits.length; i++){
-
+  for (var i=0; i< commits.length; i++){
+    
+    var commit = commits[i];
+    
+    var d = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
+    
+    if (cd !== undefined && cd.getTime() === d.getTime()){
+      count++;
+    }
+    else{
+      count = 1;
+    }
   
-//   if (cd === commits[i].split('T')[0]){
-//     count++
-//   }
-//   else{
-//     count = 1;
-//   }
-  
-//   cd = commits[i].split('T')[0];
+    cd = d;
+    c[cd.getTime()] = count;    
+  }
+  return c;
+}
 
-//   c[cd] = count;
-
-// }
-
-// console.log(c)
-
-https://api.github.com/repos/TerryMooreII/CanvasClock/commits
 var options = {
    host: 'api.github.com',
    port: 443,
@@ -351,10 +347,14 @@ request = https.get(options, function(res){
       
       async.each(repos, getCommits, function(err){
         console.log(err);
-        console.log(commits.sort());
-        console.log(commits.length);
-      })      
-      //repos.forEach( function(repo){getCommits(repo)} );
+        console.log(commits.sort(function(a,b){
+            return a<b ? -1 :a > b ? 1:0;
+          }));
+          console.log(commits.length);
+          var counts = getCount();
+          console.log(counts)
+          showDates(counts);
+      });      
 
    });
 
@@ -363,8 +363,6 @@ request = https.get(options, function(res){
    });
   
 });
-
-
 
 function getCommits(repo, callback){
   var options = {
@@ -407,28 +405,11 @@ request = https.get(options, function(res){
 }
 
 
-//'2013-09-24T00:35:13Z'
-function convertDate(date){
-//return date;
-  var y = date.substr(0, 4);
-  var m = date.substr(5,2);
-  var d = date.substr(8,2);
-  var h = date.substr(11,2);
-  var min = date.substr(14, 2);
-  var s = date.substr(17, 2);
-  
-  var da = new Date(y, m, d, h, min, s);
-  
-  console.log("Date: %s :: %d %d %d %d %d %d :: %s", date, y, m, d, h, min, s, da)
-  
-  return da;
+function showDates(counts){
+
+return;
 
 }
-
-
-
-
-
 
 
 
