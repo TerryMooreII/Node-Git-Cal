@@ -11,6 +11,6 @@ pids
 logs
 results
 
-account.js
+account.json
 npm-debug.log
 node_modules

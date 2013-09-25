@@ -178,19 +178,55 @@ function showDates(counts){
 
   console.log('first day: %d', firstDay)
 
-  console.log('  ' + sun.join(' '));
-  console.log(mon.join(' '));
-  console.log(tues.join(' '));
-  console.log(wed.join(' '));
-  console.log(thurs.join(' '));
-  console.log(fri.join(' '));
-  console.log(sat.join(' '));
 
-  
+
+  // console.log(sun.join(' '));
+  // console.log(mon.join(' '));
+  // console.log(tues.join(' '));
+  // console.log(wed.join(' '));
+  // console.log(thurs.join(' '));
+  // console.log(fri.join(' '));
+  // console.log(sat.join(' '));
+
+  xcolor.log(display(sun, true));
+  xcolor.log(display(mon, false));
+  xcolor.log(display(tues, false));
+  xcolor.log(display(wed, false));
+  xcolor.log(display(thurs, false));
+  xcolor.log(display(fri, false));
+  xcolor.log(display(sat, false));
+
 
 }
 
+function display(day, spacer){
+  var row = '';
+  if (spacer)
+    row = ' '
 
+  day.forEach(function(d){
+
+    if (d === 0)
+      row += '{{#333}}' + d;
+
+    else if (d === 1)
+      row += '{{#d6e685}}' + d;
+    
+    else if (d === 2)
+      row += '{{#8cc665}}' + d;
+    
+    else if (d === 3)
+      row += '{{#44a340}}' + d;
+
+    else 
+      row += '{{#1e6823}}' + d;
+    
+
+
+  })
+
+  return row;
+}
 
 
 
