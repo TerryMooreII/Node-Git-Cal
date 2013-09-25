@@ -202,12 +202,12 @@ function showDates(counts){
 function display(day, spacer){
   var row = '';
   if (spacer)
-    row = ' '
+    row = '  '
 
   day.forEach(function(d){
 
     if (d === 0)
-      row += '{{#333}}' + d;
+      row += '{{#333333}}' + d;
 
     else if (d === 1)
       row += '{{#d6e685}}' + d;
@@ -221,9 +221,9 @@ function display(day, spacer){
     else 
       row += '{{#1e6823}}' + d;
     
+    row += ' ';
 
-
-  })
+  });
 
   return row;
 }
