@@ -1,6 +1,7 @@
 var https = require('https');
 var async = require('async');
 var xcolor = require('xcolor');
+var account = require('./account');
 
 var repos = [];
 
@@ -57,7 +58,7 @@ var options = {
    path: '/user/repos',//'/repos/TerryMooreII/CanvasClock/commits',
    // authentication headers
    headers: {
-      'Authorization': 'Basic ' + new Buffer("terrymooreii" + ':' + "m0t3rsh0").toString('base64')
+      'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
    }   
 };
 
