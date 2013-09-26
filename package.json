@@ -1,0 +1,19 @@
+{
+  "author": "Terry Moore",
+  "name": "Node-Git-Cal",
+  "description": "Your Github calendar on the console with NodeJS",
+  "keywords": ["github, calendar, commits"],
+  "version": "0.1.0",
+  "repository":   {
+    "type": "git",
+    "url": "https://github.com/TerryMooreII/Node-Git-Cal.git"
+  },
+  "main": "./app.js",
+  "engines": {
+    "node": ">= 0.8"
+  },
+  "dependencies": {
+    "async" : "*",
+    "xcolor": "*"
+  }
+}
