@@ -8,10 +8,7 @@ var repos = [];
 var commits = [];
 var emailAddress = 'terry.moore.ii@gmail.com';
 
-
 function getCount(){
-
-
   var now = new Date(Date.now());
   var daysOfYear = [];
 
@@ -19,39 +16,33 @@ function getCount(){
       daysOfYear.push(new Date(d));
   }
 
-
-var c = [];
+  var c = [];
   
   
   for (var j=0; j< daysOfYear.length; j++){
     
     var cd = daysOfYear[j];
-    
     var count =0;
 
     for (var i=0; i< commits.length; i++){
       
       var commit = commits[i];
-      
       var d = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
-      //console.log('%s :: %s', cd, d)
-      
+
       if (cd !== undefined && cd.getTime() === d.getTime()){
       
         count++;
         cd = d;
-      }
-      else{
+      }else{
         c[cd] = count;
-        //break;
       }
-      
     }
   }
   
   return c;
  
 }
+
 var options = {
    host: 'api.github.com',
    port: 443,
@@ -104,7 +95,7 @@ function getCommits(repo, callback){
    path: '/repos/TerryMooreII/'+ repo +'/commits',
    // authentication headers
    headers: {
-      'Authorization': 'Basic ' + new Buffer("terrymooreii" + ':' + "m0t3rsh0").toString('base64')
+      'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
    }   
 };
 
