@@ -80,7 +80,8 @@ request = https.get(options, function(res){
 
       
       async.each(repos, getCommits, function(err){
-        console.log(err);
+        if (err)
+          console.log(err);
         commits.sort(function(a,b){
             return a<b ? -1 :a > b ? 1:0;
           });
@@ -144,7 +145,7 @@ function showDates(counts){
   for (var key in counts){
     if (one){
       one=false
-      var firstDay = new Date(key).getDay()      
+      var firstDay = new Date(key).getDay();      
     }
 
     switch (new Date(key).getDay()){
@@ -175,27 +176,41 @@ function showDates(counts){
 
 
   };
+  console.log('')
+  console.log(displayMonthTitle(new Date(key).getMonth()))
+  xcolor.log('     ' + display(sun, firstDay > 0 ? true : false));
+  xcolor.log(' Mon ' + display(mon, firstDay > 1 ? true : false));
+  xcolor.log('     ' + display(tues, firstDay > 2 ? true : false));
+  xcolor.log(' Wed ' + display(wed, firstDay > 3 ? true : false));
+  xcolor.log('     ' + display(thurs, firstDay > 4 ? true : false));
+  xcolor.log(' Fri ' + display(fri, firstDay > 5 ? true : false));
+  xcolor.log('     ' + display(sat, firstDay > 6 ? true : false));
+  console.log('')
 
-  console.log('first day: %d', firstDay)
+}
 
 
+function displayMonthTitle(firstMon){
+  var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
-  // console.log(sun.join(' '));
-  // console.log(mon.join(' '));
-  // console.log(tues.join(' '));
-  // console.log(wed.join(' '));
-  // console.log(thurs.join(' '));
-  // console.log(fri.join(' '));
-  // console.log(sat.join(' '));
+  var end = 11;
+  start = firstMon + 1;
+  var stop = false;
+  var row='\t    '; 
 
-  xcolor.log(display(sun, true));
-  xcolor.log(display(mon, false));
-  xcolor.log(display(tues, false));
-  xcolor.log(display(wed, false));
-  xcolor.log(display(thurs, false));
-  xcolor.log(display(fri, false));
-  xcolor.log(display(sat, false));
+  for (var i = start; i <= end; i++ ){
+    row += months[i] + '\t    ';
+  
+    if (i === end){
+      end2 = start -1;
 
+      for (var j = 0; j <= end2; j++ ){
+         row += months[j] + '\t    ';
+      }      
+    }
+
+  }
+  return row;
 
 }
 
@@ -204,22 +219,24 @@ function display(day, spacer){
   if (spacer)
     row = '  '
 
+  var char = '\u25A9';
+
   day.forEach(function(d){
 
     if (d === 0)
-      row += '{{#333333}}' + d;
+      row += '{{#222222}}' + char;
 
     else if (d === 1)
-      row += '{{#d6e685}}' + d;
+      row += '{{#d6e685}}' + char;
     
     else if (d === 2)
-      row += '{{#8cc665}}' + d;
+      row += '{{#8cc665}}' + char;
     
     else if (d === 3)
-      row += '{{#44a340}}' + d;
+      row += '{{#44a340}}' + char;
 
     else 
-      row += '{{#1e6823}}' + d;
+      row += '{{#1e6823}}' + char;
     
     row += ' ';
 
