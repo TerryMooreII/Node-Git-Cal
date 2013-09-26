@@ -1,144 +1,162 @@
-var https = require('https');
-var async = require('async');
-var xcolor = require('xcolor');
-var account = require('./account');
+var https     = require('https');
+var async     = require('async');
+var xcolor    = require('xcolor');
+var read      = require('read');
+//var account   = require('./account');
 
-var repos = [];
-
-var commits = [];
+var repos     = [];
+var commits   = [];
+var account   = {};
+var apiUrl    = 'api.github.com';
 var emailAddress = 'terry.moore.ii@gmail.com';
+var userName  = 'TerryMooreII'
 
-function getCount(){
+function mergeDatesAndCommits(){
   var now = new Date(Date.now());
   var daysOfYear = [];
-
+  var merged = [];
+ 
+  //get array of all days for the past year
   for (var d = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate() ); d <= now; d.setDate(d.getDate() + 1)) {
       daysOfYear.push(new Date(d));
   }
 
-  var c = [];
-  
-  
+  //create array of days and the number of commits for that day.
   for (var j=0; j< daysOfYear.length; j++){
     
-    var cd = daysOfYear[j];
-    var count =0;
+    var curDay = daysOfYear[j];
+    var numOfCommits =0;
 
     for (var i=0; i< commits.length; i++){
       
       var commit = commits[i];
-      var d = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
+      var day = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
 
-      if (cd !== undefined && cd.getTime() === d.getTime()){
+      if (curDay !== undefined && curDay.getTime() === day.getTime()){
       
-        count++;
-        cd = d;
+        numOfCommits++;
+        curDay = day;
       }else{
-        c[cd] = count;
+        merged[curDay] = numOfCommits;
       }
     }
   }
   
-  return c;
- 
+  return merged;
 }
 
-var options = {
-   host: 'api.github.com',
-   port: 443,
-   path: '/user/repos',//'/repos/TerryMooreII/CanvasClock/commits',
-   // authentication headers
-   headers: {
-      'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
-   }   
-};
-
-//this is the call
-request = https.get(options, function(res){
-   var body = "";
-   
-   res.on('data', function(data) {
-      body += data;
-   });
-   
-   res.on('end', function() {
-    
-      var json = JSON.parse(body);   
-    
-      json.forEach(function(obj){
-        repos.push(obj.name);
-      });
-
+function getRepoList(){
+  
+  var options = {
+     host: apiUrl,
+     port: 443,
+     path: '/user/repos',
+     // authentication headers
+     headers: {
+        'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
+     }   
+  };
+  
+  //this is the call
+  var request = https.get(options, function(res){
+     var body = "";
+     
+     res.on('data', function(data) {
+        body += data;
+     });
+     
+     res.on('end', function() {
       
-      async.each(repos, getCommits, function(err){
-        if (err)
-          console.log(err);
-        commits.sort(function(a,b){
+        var json = JSON.parse(body);   
+      
+        json.forEach(function(obj){
+          repos.push(obj.name);
+        });
+  
+        
+        async.each(repos, getCommits, function(err){
+          
+          if (err){
+            console.log(err);
+            return;
+          }
+          //Sort the commit dates
+          commits.sort(function(a,b){
             return a<b ? -1 :a > b ? 1:0;
           });
-          var count = getCount();
-          showDates(count);
-      });      
-
-   });
-
-   res.on('error', function(e) {
-      console.log("Got error: " + e.message);
-   });
+          
+          var fullCalendar = mergeDatesAndCommits();
+          var sortedCommitsByDayOfWeek = sortCommitsByDayOfWeek(fullCalendar);
+          display(sortedCommitsByDayOfWeek);
+         });      
+     });
   
-});
+     res.on('error', function(e) {
+        console.log("Got error: " + e.message);
+     });
+    
+  });
+}
 
 function getCommits(repo, callback){
   var options = {
-   host: 'api.github.com',
-   port: 443,
-   path: '/repos/TerryMooreII/'+ repo +'/commits',
-   // authentication headers
-   headers: {
+    host: apiUrl,
+    port: 443,
+    path: '/repos/' + userName + '/'+ repo +'/commits',
+    // authentication headers
+    headers: {
       'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
-   }   
-};
+    }   
+  };
 
 //this is the call
-request = https.get(options, function(res){
-   var body = "";
+  var request = https.get(options, function(res){
+    var body = "";
    
-   res.on('data', function(data) {
+    res.on('data', function(data) {
       body += data;
-   });
-   
-   res.on('end', function() {
-    
+    });
+      
+    res.on('end', function() {
+      
       var json = JSON.parse(body);   
-    
+      
       json.forEach(function(obj){
         if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === emailAddress)
           commits.push(new Date(obj.commit.committer.date));
       });
-
+    
       callback();
-
-   });
-
-   res.on('error', function(e) {
+    
+    });
+      
+    res.on('error', function(e) {
       console.log("Got error: " + e.message);
-   });
-  
-});
+    });
+    
+  });
 
 }
 
+function sortCommitsByDayOfWeek(counts){
 
-function showDates(counts){
-
-  var mon = []; var tues = []; var wed = []; var thurs = []; var fri = []; var sat = []; var sun = [];
-  var one = true;
+  var mon   = []; 
+  var tues  = []; 
+  var wed   = []; 
+  var thurs = []; 
+  var fri   = []; 
+  var sat   = []; 
+  var sun   = [];
+  var isSet = false;
+  var firstDayOfCal;
+  
   for (var key in counts){
-    if (one){
-      one=false
-      var firstDay = new Date(key).getDay();      
+    
+    if (!isSet){
+      isSet=true
+      firstDayOfCal = new Date(key).getDay();      
     }
-
+    
     switch (new Date(key).getDay()){
       case 0:
         sun.push(counts[key]);
@@ -164,28 +182,42 @@ function showDates(counts){
       default:
         console.log('you messed up')
     }
-
-
   };
-  console.log('')
-  console.log(displayMonthTitle(new Date(key).getMonth()))
-  xcolor.log('     ' + display(sun, firstDay > 0 ? true : false));
-  xcolor.log(' Mon ' + display(mon, firstDay > 1 ? true : false));
-  xcolor.log('     ' + display(tues, firstDay > 2 ? true : false));
-  xcolor.log(' Wed ' + display(wed, firstDay > 3 ? true : false));
-  xcolor.log('     ' + display(thurs, firstDay > 4 ? true : false));
-  xcolor.log(' Fri ' + display(fri, firstDay > 5 ? true : false));
-  xcolor.log('     ' + display(sat, firstDay > 6 ? true : false));
-  console.log('')
+  return {
+    firstDayOfCal: firstDayOfCal,
+    mon: mon,
+    tues: tues,
+    wed: wed,
+    thurs: thurs,
+    fri: fri,
+    sat: sat,
+    sun: sun
+  };
+}
 
+function display(commitsByDayOfWeek){
+  
+  console.log('');
+   //The if statement determines if a spacer is needed to line up dates in cal.
+  console.log(displayMonthTitle())
+  xcolor.log('     ' + displayCommits(commitsByDayOfWeek.sun, commitsByDayOfWeek.firstDayOfCal > 0 ? true : false)); 
+  xcolor.log(' Mon ' + displayCommits(commitsByDayOfWeek.mon, commitsByDayOfWeek.firstDayOfCal > 1 ? true : false));
+  xcolor.log('     ' + displayCommits(commitsByDayOfWeek.tues, commitsByDayOfWeek.firstDayOfCal > 2 ? true : false));
+  xcolor.log(' Wed ' + displayCommits(commitsByDayOfWeek.wed, commitsByDayOfWeek.firstDayOfCal > 3 ? true : false));
+  xcolor.log('     ' + displayCommits(commitsByDayOfWeek.thurs, commitsByDayOfWeek.firstDayOfCal > 4 ? true : false));
+  xcolor.log(' Fri ' + displayCommits(commitsByDayOfWeek.fri, commitsByDayOfWeek.firstDayOfCal
+  > 5 ? true : false));
+  xcolor.log('     ' + displayCommits(commitsByDayOfWeek.sat, commitsByDayOfWeek.firstDayOfCal > 6 ? true : false));
+  console.log('');
+  
 }
 
 
-function displayMonthTitle(firstMon){
+function displayMonthTitle(){
   var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
-  var end = 11;
-  start = firstMon + 1;
+  var end = 11; //Months are zero based
+  var start = new Date().getMonth() + 1;
   var stop = false;
   var row='\t    '; 
 
@@ -193,37 +225,39 @@ function displayMonthTitle(firstMon){
     row += months[i] + '\t    ';
   
     if (i === end){
-      end2 = start -1;
+      var end2 = start -1;
 
       for (var j = 0; j <= end2; j++ ){
          row += months[j] + '\t    ';
       }      
     }
-
   }
   return row;
 
 }
 
-function display(day, spacer){
+function displayCommits(day, spacer){
+ 
   var row = '';
+  
+  //Leaves a blank space to line up the days
   if (spacer)
     row = '  '
 
-  var char = '\u25A9';
+  var char = '\u25A9'; //square
+  
+  day.forEach(function(commitCount){
 
-  day.forEach(function(d){
-
-    if (d === 0)
+    if (commitCount === 0)
       row += '{{#222222}}' + char;
 
-    else if (d === 1)
+    else if (commitCount === 1)
       row += '{{#d6e685}}' + char;
     
-    else if (d === 2)
+    else if (commitCount === 2)
       row += '{{#8cc665}}' + char;
     
-    else if (d === 3)
+    else if (commitCount === 3)
       row += '{{#44a340}}' + char;
 
     else 
@@ -238,7 +272,29 @@ function display(day, spacer){
 
 
 
+function init(){
+  async.series([
+    
+    function(callback){
+      read({ prompt: 'Username: '}, function(er, username) {
+        account.username = username;
+        callback()
+      })
+    },
 
+    function(callback){
+      read({ prompt: 'Password: ', silent: true, replace: '***'}, function(er, password) {
+        account.password = password;
+        callback()
+      })
+    }
+  ], function(err){
+    getRepoList();
+  })
+}
+
+
+init();
 
 
 
