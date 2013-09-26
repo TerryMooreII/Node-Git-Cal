@@ -2,7 +2,6 @@ var https     = require('https');
 var async     = require('async');
 var xcolor    = require('xcolor');
 var read      = require('read');
-//var account   = require('./account');
 
 var repos     = [];
 var commits   = [];
