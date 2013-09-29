@@ -3,6 +3,7 @@ var async     = require('async');
 var xcolor    = require('xcolor');
 var read      = require('read');
 
+
 var repos     = [];
 var commits   = [];
 var account   = {};
@@ -248,7 +249,7 @@ function displayCommits(day, spacer){
   day.forEach(function(commitCount){
 
     if (commitCount === 0)
-      row += '{{#222222}}' + char;
+      row += '{{#212121}}' + char;
 
     else if (commitCount === 1)
       row += '{{#d6e685}}' + char;
