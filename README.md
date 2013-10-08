@@ -12,6 +12,5 @@ This code sucks right now.  Clean up will come!!
 
 * Modularize
 * Error checking on invalid login
-* remove hard coded email address
 * Months are not lined up properly
 

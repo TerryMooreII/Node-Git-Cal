@@ -8,8 +8,8 @@ var repos     = [];
 var commits   = [];
 var account   = {};
 var apiUrl    = 'api.github.com';
-var emailAddress = 'terry.moore.ii@gmail.com';
-var userName  = 'TerryMooreII'
+var emailAddress; 
+var userName;
 
 function mergeDatesAndCommits(){
   var now = new Date(Date.now());
@@ -68,7 +68,7 @@ function getRepoList(){
      res.on('end', function() {
       
         var json = JSON.parse(body);   
-      
+     
         json.forEach(function(obj){
           repos.push(obj.name);
         });
@@ -98,6 +98,43 @@ function getRepoList(){
   });
 }
 
+
+function getUserInfo(){
+  
+  var options = {
+     host: apiUrl,
+     port: 443,
+     path: '/user',
+     // authentication headers
+     headers: {
+        'Authorization': 'Basic ' + new Buffer(account.username + ':' + account.password).toString('base64')
+     }   
+  };
+  
+  //this is the call
+  var request = https.get(options, function(res){
+     var body = "";
+     
+     res.on('data', function(data) {
+        body += data;
+     });
+     
+     res.on('end', function() {
+      
+      var json = JSON.parse(body);
+      emailAddress = json.email; 
+      userName = json.login;
+
+     });
+  
+     res.on('error', function(e) {
+        console.log("Got error: " + e.message);
+     });
+    
+  });
+}
+
+
 function getCommits(repo, callback){
   var options = {
     host: apiUrl,
@@ -122,7 +159,7 @@ function getCommits(repo, callback){
       var json = JSON.parse(body);   
       
       json.forEach(function(obj){
-        if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === emailAddress)
+        if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === emailAddress.toLowerCase())
           commits.push(new Date(obj.commit.committer.date));
       });
     
@@ -287,9 +324,14 @@ function init(){
         account.password = password;
         callback()
       })
+    }, 
+    function(callback){
+      getUserInfo();
+      callback();
     }
   ], function(err){
-    getRepoList();
+    if(!err)
+      getRepoList();
   })
 }
 
