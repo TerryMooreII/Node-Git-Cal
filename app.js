@@ -326,12 +326,20 @@ function init(){
       })
     }, 
     function(callback){
+      
       getUserInfo();
-      callback();
+
+      if (!emailAddress && !userName)
+        callback("Invalid userid or password");
+      else
+        callback();
+      
     }
   ], function(err){
     if(!err)
       getRepoList();
+    else
+      console.log("Error: " + err)
   })
 }
 

@@ -11,6 +11,5 @@ This code sucks right now.  Clean up will come!!
 ##TODO
 
 * Modularize
-* Error checking on invalid login
 * Months are not lined up properly
 
