@@ -77,7 +77,7 @@ exports.display = function (commitsByDayOfWeek){
 }
 
 
-exports.displayMonthTitle =function (){
+var displayMonthTitle =function (){
   var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
   var end = 11; //Months are zero based
@@ -100,7 +100,7 @@ exports.displayMonthTitle =function (){
 
 }
 
-exports.displayCommits = function (day, spacer){
+var displayCommits = function (day, spacer){
  
   var row = '';
   

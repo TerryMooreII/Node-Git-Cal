@@ -68,7 +68,10 @@ exports.getCommits1 = function(account, user, repoList, callbackFn){
       res.on('end', function() {
         
         var json = JSON.parse(body);   
-        //console.log(json)
+        if (!json){
+          console.log('Json is null');
+          return;
+        }
         json.forEach(function(obj){
           if (obj.commit.committer &&  obj.commit.committer.email.toLowerCase() === user.email.toLowerCase())
             commits.push(new Date(obj.commit.committer.date));
