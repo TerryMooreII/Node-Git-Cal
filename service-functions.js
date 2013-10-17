@@ -81,7 +81,6 @@ exports.getCommits1 = function(account, user, repoList, callbackFn){
       });
         
       res.on('error', function(e) {
-        //callbackFn('getCommits1 : ' + e.message);
         console.log("Got error: " + e.message);
       });
       

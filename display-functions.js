@@ -81,18 +81,21 @@ var displayMonthTitle =function (){
   var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
   var end = 11; //Months are zero based
-  var start = new Date().getMonth() + 1;
+  var start = new Date().getMonth();
   var stop = false;
-  var row='\t    '; 
-
-  for (var i = start; i <= end; i++ ){
-    row += months[i] + '\t    ';
+  var row='     '; 
+  var monthSpacer = '        ';
+  var firstMonthSpacer = '  ';
+  var isFirstMonth = true;
   
+  for (var i = start; i <= end; i++ ){
+    row += months[i] + (isFirstMonth ? firstMonthSpacer : monthSpacer);
+    isFirstMonth = false;
     if (i === end){
-      var end2 = start -1;
+      var end2 = start - 1;
 
       for (var j = 0; j <= end2; j++ ){
-         row += months[j] + '\t    ';
+         row += months[j] + monthSpacer;
       }      
     }
   }
