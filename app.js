@@ -29,10 +29,15 @@ function init(){
     
     function(callback){
       hn.getUserInfo(account, function(user){
-        if (user){
+        if (user.login){
           callback(null, user);
-        }else
-          callback('Invalid user name and/or password');
+        }else{
+          if (user.message)
+            callback(user.message);
+          else
+            callback('Invalid user name and/or password');
+        }
+          
       });
     },
     
@@ -41,16 +46,16 @@ function init(){
       hn.getRepoList(account, function(repoList){
 
         if(repoList){
-          callback(null, user, repoList);
+          callback(null, user,  repoList);
         }else
           callback('User ' + user.login + ' has zero repositories');
       });
       
     },
     function(user, repoList, callback){
-    
-      hn.getCommits1(user, repoList, function(commits){
-       
+
+      hn.getCommits1(account, user, repoList, function(commits){
+        console.log(commits)
         callback(null, commits);
       })
       
@@ -64,8 +69,10 @@ function init(){
     
     
   ], function(err){
-    if(err)
-      console.log(err)
+      if(err){
+        console.log('Error :: ');
+        console.log(err);
+      }
   })
 }
 
