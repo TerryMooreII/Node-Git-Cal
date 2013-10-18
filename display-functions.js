@@ -84,7 +84,7 @@ var displayMonthTitle =function (){
   var start = new Date().getMonth();
   var stop = false;
   var row='     '; 
-  var monthSpacer = '        ';
+  var monthSpacer = '      ';
   var firstMonthSpacer = '  ';
   var isFirstMonth = true;
   
