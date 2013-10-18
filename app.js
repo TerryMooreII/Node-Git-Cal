@@ -4,9 +4,6 @@ var read      = require('read');
 var hn        = require('./service-functions');
 var hnDisplay = require('./display-functions');
 
-var repos     = [];
-var commits   = [];
-var userInfo  = {};
 var account   = {};
 
 
@@ -55,19 +52,15 @@ function init(){
     function(user, repoList, callback){
 
       hn.getCommits1(account, user, repoList, function(commits){
-        console.log(commits)
+
         callback(null, commits);
       })
-      
-            
     }, 
     function(commits){
       var fullCalendar = hnDisplay.mergeDatesAndCommits(commits);
       var sortedCommitsByDayOfWeek = hnDisplay.sortCommitsByDayOfWeek(fullCalendar);
       hnDisplay.display(sortedCommitsByDayOfWeek);
     }
-    
-    
   ], function(err){
       if(err){
         console.log('Error :: ');
