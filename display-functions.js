@@ -80,15 +80,23 @@ exports.display = function (commitsByDayOfWeek){
 var displayMonthTitle =function (){
   var months = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ];
 
+  var date = new Date();
   var end = 11; //Months are zero based
-  var start = new Date().getMonth();
+  var start = date.getMonth();
   var stop = false;
   var row='     '; 
   var monthSpacer = '      ';
   var firstMonthSpacer = '  ';
   var isFirstMonth = true;
   
+  if (date.getDate() > 20){ //Terible hack, sorry
+    start++;
+    isFirstMonth = false;
+    row += monthSpacer;
+  }
+
   for (var i = start; i <= end; i++ ){
+
     row += months[i] + (isFirstMonth ? firstMonthSpacer : monthSpacer);
     isFirstMonth = false;
     if (i === end){
@@ -152,22 +160,26 @@ exports.mergeDatesAndCommits = function(commits){
   for (var j=0; j< daysOfYear.length; j++){
     
     var curDay = daysOfYear[j];
-    var numOfCommits =0;
+    var numOfCommits = 0;
 
-    for (var i=0; i< commits.length; i++){
+    for (var i=0; i<commits.length; i++){
       
       var commit = commits[i];
       var day = new Date(commit.getFullYear(), commit.getMonth(), commit.getDate());
 
       if (curDay !== undefined && curDay.getTime() === day.getTime()){
-      
         numOfCommits++;
         curDay = day;
       }else{
         merged[curDay] = numOfCommits;
       }
+   
     }
-  }
   
+  }  
   return merged;
 }
+
+
+
+

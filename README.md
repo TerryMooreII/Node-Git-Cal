@@ -10,6 +10,5 @@ This code sucks right now.  Clean up will come!!
 
 ##TODO
 
-* Modularize
 * Months are not lined up properly
 
